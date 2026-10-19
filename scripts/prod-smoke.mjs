@@ -11,11 +11,15 @@ page.on("console", (message) => {
 });
 page.on("pageerror", (error) => errors.push(`PAGE ERROR: ${error.message}`));
 
-await page.goto("http://127.0.0.1:4173/?nopointerlock=1", { waitUntil: "networkidle" });
+await page.goto(process.env.SABER_URL ?? "http://127.0.0.1:4173/?nopointerlock=1", {
+  waitUntil: "networkidle",
+});
 const canvas = page.locator("#game-root canvas");
 await canvas.waitFor({ state: "visible" });
+await page.waitForTimeout(1200);
 await page.locator("#start-button").click();
-await page.locator('[data-character-id="constella"]').click();
+await page.locator("#character-screen").waitFor({ state: "visible" });
+await page.waitForTimeout(250);
 await page.locator("#character-start").click();
 await page.waitForTimeout(900);
 const box = await canvas.boundingBox();
