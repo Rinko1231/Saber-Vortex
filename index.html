@@ -24,7 +24,7 @@
           </div>
           <div class="vitals">
             <div class="hud-label-row">
-              <span>月蚀契约</span>
+              <span id="character-name">康丝黛拉</span>
               <span id="hp-text">100 / 100</span>
             </div>
             <div class="meter hp-meter" role="progressbar" aria-label="生命值">
@@ -32,7 +32,9 @@
             </div>
             <div class="hud-subline">
               <span>LV.<b id="level-text">1</b></span>
+              <span id="weapon-name">星轨光剑</span>
               <span id="power-text">刃压 18</span>
+              <span id="weapon-text">剑气 1</span>
             </div>
           </div>
         </div>
@@ -67,6 +69,13 @@
         <span id="xp-text">0 / 18</span>
       </div>
 
+      <button id="skill-button" class="skill-button is-hidden" type="button" aria-label="释放主动技能">
+        <span class="skill-key">SPACE</span>
+        <strong id="skill-name">剑潮</strong>
+        <em id="skill-status">READY</em>
+        <span class="skill-track"><i id="skill-fill"></i></span>
+      </button>
+
       <div id="combo-display" class="combo-display" aria-live="polite">
         <strong id="combo-number">0</strong>
         <span>连斩</span>
@@ -81,7 +90,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 12h15M14 7l5 5-5 5" />
         </svg>
-        移动鼠标控制光剑 · 距离越远剑越长
+        快速移动武器才能造成伤害 · 鼠标锁定后可持续转向
       </div>
 
       <section id="start-screen" class="overlay overlay-title">
@@ -99,20 +108,27 @@
             <p class="cn-title">光刃涡旋</p>
             <p class="lede">
               你不能移动。敌人从四面八方涌来。<br />
-              把鼠标当作剑尖，用距离改变光刃长度，<br />
+              选择六名角色之一，用速度与方向切开包围，<br />
               在虚空女帝降临前活过两分钟。
             </p>
             <div class="title-actions">
               <button id="start-button" class="primary-button" type="button">
-                <span>开始斩击</span>
+                <span>选择角色</span>
                 <kbd>Enter</kbd>
               </button>
               <button id="help-button" class="ghost-button" type="button">操作说明</button>
             </div>
             <div class="title-meta">
               <span>鼠标 / 触屏</span>
+              <span>星轨光剑</span>
               <span>单机 Demo</span>
               <span>约 2 分钟一局</span>
+            </div>
+            <div class="display-mode-control" aria-label="显示模式">
+              <span>显示模式</span>
+              <button type="button" data-display-mode="auto">自动</button>
+              <button type="button" data-display-mode="landscape">横屏</button>
+              <button type="button" data-display-mode="portrait">竖屏</button>
             </div>
           </div>
 
@@ -130,10 +146,39 @@
             </p>
             <div class="title-card-stats">
               <div><span>追踪</span><b>鼠标距离</b></div>
-              <div><span>伤害</span><b>挥砍速度</b></div>
+              <div><span>伤害</span><b>切向 + 轴向</b></div>
               <div><span>成长</span><b>三选一</b></div>
             </div>
           </aside>
+        </div>
+      </section>
+
+      <section id="character-screen" class="overlay character-overlay is-hidden">
+        <div class="character-panel">
+          <header class="character-heading">
+            <div>
+              <p class="overline">CHOOSE YOUR VORTEX</p>
+              <h2>选择你的涡心</h2>
+              <p>每名角色拥有不同武器判定、主动技能与专属强化路线。</p>
+            </div>
+            <div class="display-mode-control" aria-label="显示模式">
+              <span>显示模式</span>
+              <button type="button" data-display-mode="auto">自动</button>
+              <button type="button" data-display-mode="landscape">横屏</button>
+              <button type="button" data-display-mode="portrait">竖屏</button>
+            </div>
+          </header>
+          <div class="character-layout">
+            <div id="roster-grid" class="roster-grid" aria-label="角色列表"></div>
+            <aside id="character-detail" class="character-detail"></aside>
+          </div>
+          <footer class="character-actions">
+            <button id="character-back" class="ghost-button" type="button">返回标题</button>
+            <button id="character-start" class="primary-button" type="button">
+              <span>进入涡流</span>
+              <kbd>Enter</kbd>
+            </button>
+          </footer>
         </div>
       </section>
 
@@ -174,9 +219,17 @@
             </button>
           </div>
           <div class="help-grid">
-            <article><b>01</b><h3>控制剑长</h3><p>鼠标靠近角色时剑短，远离时剑长。最长为 420，可在升级中继续延展。</p></article>
-            <article><b>02</b><h3>快速切割</h3><p>鼠标划过敌人即可造成伤害。挥得越快，单次斩击越痛，还会积累连斩。</p></article>
-            <article><b>03</b><h3>吸收灵魂</h3><p>击破敌人后灵魂会自动飞向你。升级时游戏暂停，从三张卡里选一张。</p></article>
+            <article><b>01</b><h3>速度决定伤害</h3><p>武器静止贴住敌人不会造成伤害。切向速度产生斩击，轴向伸缩产生刺击；不同角色有不同系数。</p></article>
+            <article><b>02</b><h3>鼠标锁定</h3><p>桌面端开始战斗后会自动锁定鼠标，指针离开窗口或碰到状态栏也能继续控制。Esc 会解锁并暂停。</p></article>
+            <article><b>03</b><h3>吸收灵魂</h3><p>击破敌人后灵魂会自动飞向你。升级时游戏暂停，从三张卡里选一张；角色专属强化会标出专属路线。</p></article>
+          </div>
+          <div class="help-legend" aria-label="特殊敌人词缀图例">
+            <span style="--badge:#8dffd2">绿环 · 孵裂</span>
+            <span style="--badge:#ff8f5e">橙环 · 殉爆</span>
+            <span style="--badge:#ffd782">金环 · 斩击易伤</span>
+            <span style="--badge:#ff9b7a">珊瑚环 · 刺击易伤</span>
+            <span style="--badge:#7ef8ff">青环 · 滞刃</span>
+            <span style="--badge:#c7a0ff">紫环 · 侧盾</span>
           </div>
           <p class="help-note">Esc 暂停 · 暂停界仍可查看本次构筑</p>
         </div>
@@ -198,10 +251,6 @@
         </div>
       </section>
 
-      <section id="rotate-screen" class="rotate-screen" aria-hidden="true">
-        <span>☾</span>
-        <p>请横屏握住剑柄</p>
-      </section>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
