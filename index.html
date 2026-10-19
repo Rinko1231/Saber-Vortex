@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Saber Vortex：固定站位、以鼠标控制伸缩光剑的二次元肉鸽生存游戏。"
+    />
+    <meta name="theme-color" content="#090718" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>Saber Vortex · 光刃涡旋</title>
+  </head>
+  <body>
+    <main id="app">
+      <div id="game-root" aria-label="Saber Vortex 游戏区域"></div>
+      <div class="scene-vignette" aria-hidden="true"></div>
+      <div id="damage-flash" aria-hidden="true"></div>
+
+      <section id="hud" class="hud is-hidden" aria-label="战斗信息">
+        <div class="hud-cluster hud-left">
+          <div class="sigil-badge" aria-hidden="true">
+            <span>☾</span>
+          </div>
+          <div class="vitals">
+            <div class="hud-label-row">
+              <span>月蚀契约</span>
+              <span id="hp-text">100 / 100</span>
+            </div>
+            <div class="meter hp-meter" role="progressbar" aria-label="生命值">
+              <span id="hp-fill"></span>
+            </div>
+            <div class="hud-subline">
+              <span>LV.<b id="level-text">1</b></span>
+              <span id="power-text">刃压 18</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-center">
+          <div id="wave-label" class="eyebrow">第 1 涡流</div>
+          <div id="timer" class="timer">02:00</div>
+          <div id="boss-bar" class="boss-track is-hidden" role="progressbar" aria-label="首领生命值">
+            <span id="boss-fill"></span>
+            <em>虚空女帝</em>
+          </div>
+        </div>
+
+        <div class="hud-cluster hud-right">
+          <div class="score-cell">
+            <span>斩灭</span>
+            <strong id="kill-text">0</strong>
+          </div>
+          <div class="score-cell">
+            <span>最高连斩</span>
+            <strong id="best-combo-text">0</strong>
+          </div>
+          <button id="pause-button" class="icon-button" type="button" aria-label="暂停游戏">
+            <span></span><span></span>
+          </button>
+        </div>
+      </section>
+
+      <div id="xp-shell" class="xp-shell is-hidden" aria-label="经验值">
+        <span class="xp-caption">SOUL</span>
+        <div class="xp-track"><span id="xp-fill"></span></div>
+        <span id="xp-text">0 / 18</span>
+      </div>
+
+      <div id="combo-display" class="combo-display" aria-live="polite">
+        <strong id="combo-number">0</strong>
+        <span>连斩</span>
+      </div>
+
+      <div id="banner" class="banner" aria-live="polite">
+        <span id="banner-kicker"></span>
+        <strong id="banner-title"></strong>
+      </div>
+
+      <div id="field-hint" class="field-hint">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 12h15M14 7l5 5-5 5" />
+        </svg>
+        移动鼠标控制光剑 · 距离越远剑越长
+      </div>
+
+      <section id="start-screen" class="overlay overlay-title">
+        <div class="title-layout">
+          <div class="title-copy">
+            <p class="overline">A TWO-MINUTE BLADE ROGUELIKE</p>
+            <div class="logo-mark" aria-hidden="true">
+              <span class="logo-ring"></span>
+              <span class="logo-crescent">☾</span>
+            </div>
+            <h1>
+              <span>SABER</span>
+              <span class="logo-vortex">VORTEX</span>
+            </h1>
+            <p class="cn-title">光刃涡旋</p>
+            <p class="lede">
+              你不能移动。敌人从四面八方涌来。<br />
+              把鼠标当作剑尖，用距离改变光刃长度，<br />
+              在虚空女帝降临前活过两分钟。
+            </p>
+            <div class="title-actions">
+              <button id="start-button" class="primary-button" type="button">
+                <span>开始斩击</span>
+                <kbd>Enter</kbd>
+              </button>
+              <button id="help-button" class="ghost-button" type="button">操作说明</button>
+            </div>
+            <div class="title-meta">
+              <span>鼠标 / 触屏</span>
+              <span>单机 Demo</span>
+              <span>约 2 分钟一局</span>
+            </div>
+          </div>
+
+          <aside class="title-card">
+            <span class="title-card-index">01 / CORE LOOP</span>
+            <div class="blade-preview" aria-hidden="true">
+              <div class="preview-core">☾</div>
+              <div class="preview-line"><span></span></div>
+              <div class="preview-tip"></div>
+            </div>
+            <h2>指向 · 切断 · 变强</h2>
+            <p>
+              剑尖跟随鼠标。离角色越远，剑越长；贴得越近，挥砍越灵活。
+              每个升级都会改变下一波战斗的节奏。
+            </p>
+            <div class="title-card-stats">
+              <div><span>追踪</span><b>鼠标距离</b></div>
+              <div><span>伤害</span><b>挥砍速度</b></div>
+              <div><span>成长</span><b>三选一</b></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="pause-screen" class="overlay centered is-hidden">
+        <div class="compact-panel">
+          <p class="overline">THE VORTEX WAITS</p>
+          <h2>涡流暂歇</h2>
+          <p>战斗已暂停。剑仍在等你。</p>
+          <button id="resume-button" class="primary-button" type="button">继续战斗</button>
+          <button id="restart-button" class="text-button" type="button">重新开始</button>
+        </div>
+      </section>
+
+      <section id="upgrade-screen" class="overlay centered is-hidden">
+        <div class="upgrade-panel">
+          <div class="upgrade-heading">
+            <div>
+              <p class="overline">SOUL RESONANCE</p>
+              <h2>灵魂共鸣</h2>
+            </div>
+            <span id="upgrade-level" class="level-pill">LV.2</span>
+          </div>
+          <p class="upgrade-lede">选择一种力量，重塑下一段涡流。</p>
+          <div id="upgrade-cards" class="upgrade-cards"></div>
+          <p class="upgrade-footnote">按 1 / 2 / 3 快速选择</p>
+        </div>
+      </section>
+
+      <section id="help-screen" class="overlay centered is-hidden">
+        <div class="help-panel">
+          <div class="upgrade-heading">
+            <div>
+              <p class="overline">FIELD NOTES</p>
+              <h2>战斗手记</h2>
+            </div>
+            <button id="help-close" class="icon-button" type="button" aria-label="关闭说明">
+              <span></span><span></span>
+            </button>
+          </div>
+          <div class="help-grid">
+            <article><b>01</b><h3>控制剑长</h3><p>鼠标靠近角色时剑短，远离时剑长。最长为 420，可在升级中继续延展。</p></article>
+            <article><b>02</b><h3>快速切割</h3><p>鼠标划过敌人即可造成伤害。挥得越快，单次斩击越痛，还会积累连斩。</p></article>
+            <article><b>03</b><h3>吸收灵魂</h3><p>击破敌人后灵魂会自动飞向你。升级时游戏暂停，从三张卡里选一张。</p></article>
+          </div>
+          <p class="help-note">Esc 暂停 · 暂停界仍可查看本次构筑</p>
+        </div>
+      </section>
+
+      <section id="end-screen" class="overlay centered is-hidden">
+        <div class="end-panel">
+          <p id="end-kicker" class="overline">THE VORTEX CLOSED</p>
+          <h2 id="end-title">涡流已平息</h2>
+          <p id="end-copy">你用光刃守住了月蚀契约。</p>
+          <div class="end-stats">
+            <div><span>存活</span><strong id="end-time">00:00</strong></div>
+            <div><span>斩灭</span><strong id="end-kills">0</strong></div>
+            <div><span>最高连斩</span><strong id="end-combo">0</strong></div>
+            <div><span>等级</span><strong id="end-level">1</strong></div>
+          </div>
+          <button id="end-restart" class="primary-button" type="button">再入涡流</button>
+          <button id="end-menu" class="text-button" type="button">返回标题</button>
+        </div>
+      </section>
+
+      <section id="rotate-screen" class="rotate-screen" aria-hidden="true">
+        <span>☾</span>
+        <p>请横屏握住剑柄</p>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
